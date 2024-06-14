@@ -58,4 +58,4 @@ We welcome contributions! If you'd like to improve this project, please follow t
 
 TBD
 
-Made with love by NumenGames <3
+Made with love by Numen Games <3
