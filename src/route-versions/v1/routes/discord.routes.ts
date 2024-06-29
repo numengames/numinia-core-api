@@ -22,5 +22,13 @@ export default class DiscordRoutes {
       '/sendWebHook/login',
       this.discordController.sendWebhookLogin.bind(this.discordController),
     );
+    this.router.post(
+      '/sendWebHook/logout',
+      this.discordController.sendWebhookLogout.bind(this.discordController),
+    );
+    this.router.post(
+      '/sendWebHook/chat',
+      this.discordController.sendWebhookChat.bind(this.discordController),
+    );
   }
 }

@@ -1,15 +1,13 @@
-import { Request } from 'express';
 import Joi from 'joi';
+import { Request } from 'express';
 
+import {
+  schema as discordWebhookLoginLogoutSchema
+} from './validate-discord-send-webhook-login-logout-input-params';
 import { paramNotValidError } from '../errors';
 
-const schema = Joi.object({
-  walletId: Joi.string().trim(),
-  userName: Joi.string().trim(),
-  season: Joi.number().required(),
-  spaceUrl: Joi.string().trim().required(),
-  spaceName: Joi.string().trim().required(),
-}).required();
+const schema = discordWebhookLoginLogoutSchema
+  .concat(Joi.object({ text: Joi.string().trim().required() }));
 
 export default async (body: Request['body']) => {
   try {
