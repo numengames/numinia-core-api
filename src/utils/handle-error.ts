@@ -1,6 +1,6 @@
 import Boom from '@hapi/boom';
-import { Request, Response, NextFunction } from 'express';
 import { createLoggerHandler as loggerHandler } from '@numengames/numinia-logger';
+import { NextFunction, Request, Response } from 'express';
 
 import { CustomError, HttpError } from '../types/errors';
 
@@ -12,12 +12,7 @@ function isHttpError(error: any): error is HttpError {
   return error && typeof error.statusCode === 'number';
 }
 
-function handleError(
-  error: Error | HttpError | Boom.Boom,
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) {
+function handleError(error: Error | HttpError | Boom.Boom, req: Request, res: Response, next: NextFunction) {
   if (res.headersSent) {
     return next(error);
   }
@@ -40,18 +35,13 @@ function handleError(
         errorCode: originalError.errorCode,
       };
 
-      logger.logError(
-        `${req.originalUrl} - error: ${payload.message}`,
-        originalError,
-      );
+      logger.logError(`${req.originalUrl} - error: ${payload.message}`, originalError);
     }
   } else {
     logger.logError(`${req.originalUrl} - error:`, error);
   }
 
-  return res
-    .status(statusCode || DefaultError.statusCode)
-    .json(payload || DefaultError.payload);
+  return res.status(statusCode || DefaultError.statusCode).json(payload || DefaultError.payload);
 }
 
 export default handleError;

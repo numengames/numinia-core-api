@@ -1,27 +1,26 @@
-import { Router } from 'express';
 import { interfaces as loggerInterfaces } from '@numengames/numinia-logger';
+import { Router } from 'express';
 
-import DiscordController, {
-  IDiscordController,
-} from '../controllers/discord.controller';
+import { discordService } from '../../../services';
+import DiscordController, { DiscordControllerAttributes } from '../controllers/discord.controller';
 
 export default class DiscordRoutes {
   router: Router;
 
-  discordController: IDiscordController;
+  discordController: DiscordControllerAttributes;
 
   constructor(loggerHandler: (title: string) => loggerInterfaces.ILogger) {
     this.router = Router();
 
-    this.discordController = new DiscordController({ loggerHandler });
+    this.discordController = new DiscordController({ discordService });
 
     this.routes();
   }
 
   routes() {
     this.router.post(
-      '/sendWebHook',
-      this.discordController.sendWebhook.bind(this.discordController),
+      '/sendWebHook/login',
+      this.discordController.sendWebhookLogin.bind(this.discordController),
     );
   }
 }

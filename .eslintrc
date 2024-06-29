@@ -9,7 +9,7 @@
     "plugins": [
       "@typescript-eslint",
       "eslint-plugin-jest",
-      "prettier"
+      "eslint-config-prettier"
     ],
     "extends": [
       "eslint:recommended",

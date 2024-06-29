@@ -1,10 +1,8 @@
-import { Router } from 'express';
 import { interfaces as loggerInterfaces } from '@numengames/numinia-logger';
+import { Router } from 'express';
 
-import ScoreController, {
-  IScoreController,
-} from '../controllers/score.controller';
 import { scoreService } from '../../../services';
+import ScoreController, { IScoreController } from '../controllers/score.controller';
 
 export default class ScoreRoutes {
   router: Router;
@@ -23,9 +21,6 @@ export default class ScoreRoutes {
   }
 
   routes(): void {
-    this.router.post(
-      '/',
-      this.scoreController.setGameScore.bind(this.scoreController),
-    );
+    this.router.post('/', this.scoreController.setGameScore.bind(this.scoreController));
   }
 }

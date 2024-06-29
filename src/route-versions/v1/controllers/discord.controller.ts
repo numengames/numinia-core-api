@@ -1,41 +1,28 @@
 import Bluebird from 'bluebird';
 import { NextFunction, Request, Response } from 'express';
-import { interfaces as loggerInterfaces } from '@numengames/numinia-logger';
 
+import { DiscordServiceAttributes } from '../../../services/discord.service';
 import validateDiscordSendWebhookInputParams from '../../../validators/validate-discord-send-webhook-input-params';
 
-export interface IDiscordController {
-  sendWebhook: (
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) => Promise<void>;
+export interface DiscordControllerAttributes {
+  sendWebhookLogin: (req: Request, res: Response, next: NextFunction) => Promise<void>;
 }
 
 type TDiscordControllerParams = {
-  loggerHandler: (title: string) => loggerInterfaces.ILogger;
+  discordService: DiscordServiceAttributes;
 };
 
-export default class DiscordController implements IDiscordController {
-  private readonly logger: loggerInterfaces.ILogger;
+export default class DiscordController implements DiscordControllerAttributes {
+  private readonly discordService: DiscordServiceAttributes;
 
-  constructor({ loggerHandler }: TDiscordControllerParams) {
-    this.logger = loggerHandler('DiscordController');
+  constructor({ discordService }: TDiscordControllerParams) {
+    this.discordService = discordService;
   }
 
-  async sendWebhook(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ): Promise<void> {
+  async sendWebhookLogin(req: Request, res: Response, next: NextFunction): Promise<void> {
     Bluebird.resolve(req.body)
       .then(validateDiscordSendWebhookInputParams)
-      .tap(({ season, spaceUrl, spaceName, walletId, userName }) =>
-        this.logger.logInfo(
-          `An user enter the space: ${spaceName} with a url: ${spaceUrl} as a user with walletId: ${walletId}, userName: ${userName} (season ${season})`,
-          { level: 'info', discord: true },
-        ),
-      )
+      .tap(this.discordService.login.bind(this.discordService))
       .then(res.status(204).send.bind(res))
       .catch(next);
   }

@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
 import { interfaces } from '@numengames/numinia-logger';
+import { Request, Response } from 'express';
 
 export interface IMonitController {
   getHealthStatus: (req: Request, res: Response) => void;

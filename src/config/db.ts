@@ -2,15 +2,7 @@ import { connect as modelConnect } from '@numengames/numinia-models';
 import { TMongoConfig } from './types';
 
 export default {
-  connect: ({
-    protocol,
-    user,
-    pass,
-    host,
-    port,
-    databaseName,
-    options,
-  }: TMongoConfig): void => {
+  connect: ({ protocol, user, pass, host, port, databaseName, options }: TMongoConfig): void => {
     if (process.env.NODE_ENV !== 'test') {
       const userPass = user && pass ? `${user}:${pass}@` : '';
 

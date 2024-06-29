@@ -1,9 +1,9 @@
-import { Router } from 'express';
 import { createLoggerHandler as loggerHandler } from '@numengames/numinia-logger';
+import { Router } from 'express';
 
-import ScoreRoutes from './routes/score.routes';
-import MonitRoutes from './routes/monit.routes';
 import DiscordRoutes from './routes/discord.routes';
+import MonitRoutes from './routes/monit.routes';
+import ScoreRoutes from './routes/score.routes';
 
 export default () => {
   const router = Router();

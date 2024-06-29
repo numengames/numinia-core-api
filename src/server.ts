@@ -1,15 +1,15 @@
 import 'dotenv/config';
 import express from 'express';
 
-import cors from 'cors';
 import compression from 'compression';
+import cors from 'cors';
 
-import db from './config/db';
 import config from './config';
+import db from './config/db';
 
+import { initExpressLogger } from '@numengames/numinia-logger';
 import v1Routes from './route-versions/v1';
 import handleError from './utils/handle-error';
-import { initExpressLogger } from '@numengames/numinia-logger';
 
 class Server {
   public app: express.Application;

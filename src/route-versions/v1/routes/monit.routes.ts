@@ -1,9 +1,7 @@
-import { Router } from 'express';
 import { interfaces } from '@numengames/numinia-logger';
+import { Router } from 'express';
 
-import MonitController, {
-  IMonitController,
-} from '../controllers/monit.controller';
+import MonitController, { IMonitController } from '../controllers/monit.controller';
 
 export default class MonitRoutes {
   router: Router;
@@ -19,9 +17,6 @@ export default class MonitRoutes {
   }
 
   routes() {
-    this.router.get(
-      '/health',
-      this.monitController.getHealthStatus.bind(this.monitController),
-    );
+    this.router.get('/health', this.monitController.getHealthStatus.bind(this.monitController));
   }
 }
