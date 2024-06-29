@@ -24,7 +24,7 @@ export default class DiscordService implements DiscordServiceAttributes {
     const parsedWallet = calculateWalletAddress(walletId as string);
 
     this.logger.logInfo(
-      `An user enter the space: ${spaceName} with a url: ${spaceUrl} as a user with walletId: ${parsedWallet}, userName: ${userName} (season ${season})`,
+      `An user ${userName || 'annonymous'} enter the space: ${spaceName} (${spaceUrl}) (season ${season})${parsedWallet && ' with walletId: ' + parsedWallet}`,
       this.loggerOptions,
     );
   }
