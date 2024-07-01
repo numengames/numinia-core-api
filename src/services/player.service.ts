@@ -22,7 +22,7 @@ export default class PlayerService implements PlayerServiceAttributes {
   }
 
   private async doesPlayerByWalletIdExist(walletId: string): Promise<boolean> {
-    const playerDocumennt = this.PlayerModel.exists({ walletId });
+    const playerDocumennt = await this.PlayerModel.exists({ walletId });
     return playerDocumennt !== null;
   }
 
@@ -32,6 +32,5 @@ export default class PlayerService implements PlayerServiceAttributes {
     if (!playerDocumentExists) {
       await this.PlayerModel.create({ walletId, userName });
     }
-
   }
 }

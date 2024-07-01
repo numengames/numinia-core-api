@@ -75,11 +75,11 @@ interface InsertPlayerParams extends Partial<modelInterfaces.PlayerAttributes> {
 export async function insertPlayer(params: InsertPlayerParams = {}): Promise<modelInterfaces.PlayerAttributes> {
   const query: Partial<modelInterfaces.PlayerAttributes> = {
     accounts: [],
-    lastConectionDate: new Date(),
-    userName: faker.internet.userName(),
-    walletId: faker.finance.ethereumAddress(),
-    isActive: faker.helpers.arrayElement([true, false]),
-    isBlocked: faker.helpers.arrayElement([true, false]),
+    lastConectionDate: params.lastConectionDate || new Date(),
+    userName: params.userName || faker.internet.userName(),
+    walletId: params.walletId || faker.finance.ethereumAddress(),
+    isActive: params.isActive || faker.helpers.arrayElement([true, false]),
+    isBlocked: params.isBlocked || faker.helpers.arrayElement([true, false]),
   };
 
   if (!params.account) {
