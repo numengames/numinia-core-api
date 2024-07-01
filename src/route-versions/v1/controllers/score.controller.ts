@@ -28,12 +28,12 @@ export default class ScoreController implements IScoreController {
   private async handleSetGameScore(params: Record<string, unknown>) {
     const gameDocument = await this.scoreService.getGameByName(params.name as string);
 
-    const userDocument = await this.scoreService.getUserFromWalletIdLean(params.walletId as string);
+    const playerDocument = await this.scoreService.getPlayerFromWalletIdLean(params.walletId as string);
 
     await this.scoreService.setGameScore({
       ...(params as Partial<modelTypes.GameScoreDocument>),
       game: gameDocument._id,
-      ...(userDocument ? { user: userDocument._id } : {}),
+      ...(playerDocument ? { player: playerDocument._id } : {}),
     });
   }
 

@@ -3,7 +3,7 @@ import {
   ConversationChunkModel,
   ConversationModel,
   GameModel,
-  UserModel,
+  PlayerModel,
   constants,
   interfaces as modelInterfaces,
   mongoose,
@@ -29,8 +29,8 @@ export async function insertConversation(
     parsedParams.model = 'gpt-4o'; // By default, we set one
   }
 
-  if (params.user) {
-    parsedParams.user = params.user;
+  if (params.player) {
+    parsedParams.player = params.player;
   }
 
   return ConversationModel.create(parsedParams);
@@ -68,12 +68,12 @@ export async function insertGame(
   return GameModel.create(parsedParams);
 }
 
-interface InsertUserParams extends Partial<modelInterfaces.UserAttributes> {
-  account?: modelInterfaces.UserAccountAttributes;
+interface InsertPlayerParams extends Partial<modelInterfaces.PlayerAttributes> {
+  account?: modelInterfaces.PlayerAccountAttributes;
 }
 
-export async function insertUser(params: InsertUserParams = {}): Promise<modelInterfaces.UserAttributes> {
-  const query: Partial<modelInterfaces.UserAttributes> = {
+export async function insertPlayer(params: InsertPlayerParams = {}): Promise<modelInterfaces.PlayerAttributes> {
+  const query: Partial<modelInterfaces.PlayerAttributes> = {
     accounts: [],
     lastConectionDate: new Date(),
     userName: faker.internet.userName(),
@@ -96,5 +96,5 @@ export async function insertUser(params: InsertUserParams = {}): Promise<modelIn
     Object.entries({ ...query, ...params }).filter(([_, v]) => v !== undefined),
   );
 
-  return UserModel.create(finalData);
+  return PlayerModel.create(finalData);
 }

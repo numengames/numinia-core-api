@@ -1,16 +1,16 @@
 import { faker } from '@faker-js/faker';
 import {
-  GameModel,
-  GameScoreModel,
-  UserModel,
-  interfaces as modelInterfaces,
-  mongoose,
   types,
+  mongoose,
+  GameModel,
+  PlayerModel,
+  GameScoreModel,
+  interfaces as modelInterfaces,
 } from '@numengames/numinia-models';
 import supertest from 'supertest';
 
 import { server } from '../../../../src/server';
-import { insertGame, insertUser } from '../../../insert-data-to-model';
+import { insertGame, insertPlayer } from '../../../insert-data-to-model';
 
 const testDatabase = require('../../../test-db')(mongoose);
 
@@ -72,21 +72,21 @@ describe('GameRoutes', () => {
       };
 
       beforeAll(async () => {
-        await Promise.all([insertGame(), insertUser({ walletId: params.walletId })]);
+        await Promise.all([insertGame(), insertPlayer({ walletId: params.walletId })]);
         response = await supertest(server.app).post(path).send(params);
       });
 
-      afterAll(() => UserModel.deleteOne({ walletId: params.walletId }));
+      afterAll(() => PlayerModel.deleteOne({ walletId: params.walletId }));
 
       test('it should response a statusCode of 404 - Not found', () => {
         expect(response.statusCode).toBe(404);
       });
     });
 
-    describe('when the conversation with assistant has been created but the user has no wallet', () => {
+    describe('when the conversation with assistant has been created but the player has no wallet', () => {
       let response: supertest.Response;
 
-      let userDocument: modelInterfaces.UserAttributes;
+      let playerDocument: modelInterfaces.PlayerAttributes;
 
       const params = {
         name: faker.word.words(),
@@ -95,7 +95,7 @@ describe('GameRoutes', () => {
       };
 
       beforeAll(async () => {
-        userDocument = await insertUser({ walletId: undefined });
+        playerDocument = await insertPlayer({ walletId: undefined });
         await insertGame({ name: params.name, isActive: true });
         response = await supertest(server.app).post(path).send(params);
       });
@@ -103,7 +103,7 @@ describe('GameRoutes', () => {
       afterAll(() =>
         Promise.all([
           GameModel.deleteOne({ name: params.name }),
-          UserModel.deleteOne({ _id: userDocument._id }),
+          PlayerModel.deleteOne({ _id: playerDocument._id }),
         ]),
       );
 
@@ -125,8 +125,8 @@ describe('GameRoutes', () => {
         expect(gameDocument.averageTime).toBeDefined();
       });
 
-      test('it should have a user document with all the params defined', async () => {
-        const document = <types.UserDocument>await UserModel.findById(userDocument._id);
+      test('it should have a player document with all the params defined', async () => {
+        const document = <types.PlayerDocument>await PlayerModel.findById(playerDocument._id);
 
         expect(document._id).toBeDefined();
         expect(document.userName).toBeDefined();
@@ -144,10 +144,10 @@ describe('GameRoutes', () => {
       test('it should have created a game score document with all the params defined', async () => {
         const gameDocument = <types.GameDocument>await GameModel.findOne({ name: params.name });
 
-        const document = <types.UserDocument>await UserModel.findById(userDocument._id);
+        const document = <types.PlayerDocument>await PlayerModel.findById(playerDocument._id);
 
         const gameScoreDocument = await GameScoreModel.findOne({
-          user: userDocument._id,
+          player: playerDocument._id,
           game: gameDocument._id,
         });
 
@@ -157,7 +157,7 @@ describe('GameRoutes', () => {
         expect(gameScoreDocument?.createdAt).toBeDefined();
         expect(gameScoreDocument?.updatedAt).toBeDefined();
         expect(gameScoreDocument?.game.toString()).toBe(gameDocument._id.toString());
-        expect(gameScoreDocument?.user?.toString()).toBe(document._id.toString());
+        expect(gameScoreDocument?.player?.toString()).toBe(document._id.toString());
       });
     });
 
@@ -173,7 +173,7 @@ describe('GameRoutes', () => {
 
       beforeAll(async () => {
         await Promise.all([
-          insertUser({ walletId: params.walletId }),
+          insertPlayer({ walletId: params.walletId }),
           insertGame({ name: params.name, isActive: true }),
         ]);
         response = await supertest(server.app).post(path).send(params);
@@ -182,7 +182,7 @@ describe('GameRoutes', () => {
       afterAll(() =>
         Promise.all([
           GameModel.deleteOne({ name: params.name }),
-          UserModel.deleteOne({ walletId: params.walletId }),
+          PlayerModel.deleteOne({ walletId: params.walletId }),
         ]),
       );
 
@@ -204,30 +204,30 @@ describe('GameRoutes', () => {
         expect(gameDocument.averageTime).toBeDefined();
       });
 
-      test('it should have a user document with all the params defined', async () => {
-        const userDocument = <types.UserDocument>await UserModel.findOne({ walletId: params.walletId });
+      test('it should have a player document with all the params defined', async () => {
+        const playerDocument = <types.PlayerDocument>await PlayerModel.findOne({ walletId: params.walletId });
 
-        expect(userDocument._id).toBeDefined();
-        expect(userDocument.userName).toBeDefined();
-        expect(userDocument.isBlocked).toBeDefined();
-        expect(userDocument.isActive).toBeDefined();
-        expect(userDocument.walletId).toBe(params.walletId);
-        expect(userDocument.createdAt).toBeDefined();
-        expect(userDocument.updatedAt).toBeDefined();
-        expect(userDocument.lastConectionDate).toBeDefined();
-        expect(userDocument.accounts).toHaveLength(1);
-        expect(userDocument.accounts[0].accountId).toBeDefined();
-        expect(userDocument.accounts[0].kind).toBeDefined();
+        expect(playerDocument._id).toBeDefined();
+        expect(playerDocument.userName).toBeDefined();
+        expect(playerDocument.isBlocked).toBeDefined();
+        expect(playerDocument.isActive).toBeDefined();
+        expect(playerDocument.walletId).toBe(params.walletId);
+        expect(playerDocument.createdAt).toBeDefined();
+        expect(playerDocument.updatedAt).toBeDefined();
+        expect(playerDocument.lastConectionDate).toBeDefined();
+        expect(playerDocument.accounts).toHaveLength(1);
+        expect(playerDocument.accounts[0].accountId).toBeDefined();
+        expect(playerDocument.accounts[0].kind).toBeDefined();
       });
 
       test('it should have created a game score document with all the params defined', async () => {
         const gameDocument = <types.GameDocument>await GameModel.findOne({ name: params.name });
 
-        const userDocument = <types.UserDocument>await UserModel.findOne({ walletId: params.walletId });
+        const playerDocument = <types.PlayerDocument>await PlayerModel.findOne({ walletId: params.walletId });
 
         const gameScoreDocument = <types.GameScoreDocument>await GameScoreModel.findOne({
-          user: userDocument._id,
           game: gameDocument._id,
+          player: playerDocument._id,
         });
 
         expect(gameScoreDocument._id).toBeDefined();
@@ -236,7 +236,7 @@ describe('GameRoutes', () => {
         expect(gameScoreDocument.createdAt).toBeDefined();
         expect(gameScoreDocument.updatedAt).toBeDefined();
         expect(gameScoreDocument.game.toString()).toBe(gameDocument._id.toString());
-        expect(gameScoreDocument.user?.toString()).toBe(userDocument._id.toString());
+        expect(gameScoreDocument.player?.toString()).toBe(playerDocument._id.toString());
       });
     });
   });

@@ -5,13 +5,13 @@ import { Model } from 'mongoose';
 import { gameNotExistError } from '../errors';
 
 export interface IScoreService {
-  getUserFromWalletIdLean(walletId: string): Promise<modelInterfaces.UserAttributes | null>;
+  getPlayerFromWalletIdLean(walletId: string): Promise<modelInterfaces.PlayerAttributes | null>;
   setGameScore: (params: Partial<modelTypes.GameScoreDocument>) => Promise<void>;
   getGameByName: (name: string) => Promise<modelInterfaces.GameAttributes>;
 }
 
 interface ScoreServiceConstructor {
-  UserModel: Model<modelInterfaces.UserAttributes>;
+  PlayerModel: Model<modelInterfaces.PlayerAttributes>;
   GameModel: Model<modelInterfaces.GameAttributes>;
   GameScoreModel: Model<modelInterfaces.GameScoreAttributes>;
   loggerHandler: (title: string) => loggerInterfaces.ILogger;
@@ -22,23 +22,23 @@ export default class ScoreService implements IScoreService {
 
   private GameModel: Model<modelInterfaces.GameAttributes>;
 
-  private UserModel: Model<modelInterfaces.UserAttributes>;
+  private PlayerModel: Model<modelInterfaces.PlayerAttributes>;
 
   private GameScoreModel: Model<modelInterfaces.GameScoreAttributes>;
 
-  constructor({ UserModel, GameModel, loggerHandler, GameScoreModel }: ScoreServiceConstructor) {
-    this.UserModel = UserModel;
+  constructor({ PlayerModel, GameModel, loggerHandler, GameScoreModel }: ScoreServiceConstructor) {
     this.GameModel = GameModel;
+    this.PlayerModel = PlayerModel;
     this.GameScoreModel = GameScoreModel;
     this.logger = loggerHandler('ScoreService');
   }
 
-  async getUserFromWalletIdLean(walletId: string): Promise<modelInterfaces.UserAttributes | null> {
-    this.logger.logInfo(`getUserFromWalletIdLean - Trying to get an user by the walletId ${walletId}`);
+  async getPlayerFromWalletIdLean(walletId: string): Promise<modelInterfaces.PlayerAttributes | null> {
+    this.logger.logInfo(`getPlayerFromWalletIdLean - Trying to get a player by its walletId ${walletId}`);
     const query = { walletId };
     const filter = { updatedAt: 0 };
 
-    return this.UserModel.findOne(query, filter).lean();
+    return this.PlayerModel.findOne(query, filter).lean();
   }
 
   async getGameByName(name: string): Promise<modelInterfaces.GameAttributes> {
@@ -58,7 +58,7 @@ export default class ScoreService implements IScoreService {
 
   async setGameScore(params: Partial<modelTypes.GameScoreDocument>): Promise<void> {
     this.logger.logInfo(
-      `setGameScore - Creating a new game score register from game ${params.game} for user ${params.user}`,
+      `setGameScore - Creating a new game score register from game ${params.game} for player ${params.player}`,
     );
     await this.GameScoreModel.create(params);
   }
