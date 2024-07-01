@@ -7,7 +7,7 @@ import {
 import { paramNotValidError } from '../errors';
 
 const schema = discordWebhookLoginLogoutSchema
-  .concat(Joi.object({ text: Joi.string().trim().required() }));
+  .concat(Joi.object({ message: Joi.string().trim().required() }));
 
 export default async (body: Request['body']) => {
   try {
