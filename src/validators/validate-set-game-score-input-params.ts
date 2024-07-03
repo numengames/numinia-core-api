@@ -4,8 +4,8 @@ import Joi from 'joi';
 import { paramNotValidError } from '../errors';
 
 const schema = Joi.object({
+  score: Joi.number(),
   walletId: Joi.string().trim(),
-  score: Joi.number().required(),
   timer: Joi.number().required(),
   name: Joi.string().trim().required(),
 }).required();
