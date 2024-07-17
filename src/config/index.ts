@@ -12,6 +12,11 @@ export default {
     user: process.env.MONGODB_USER || '',
     pass: process.env.MONGODB_PASS || '',
   },
+  assets: {
+    address: process.env.ASSET_ADDRESS || '',
+    privateKey: process.env.ASSET_PRIVATE_KEY || '',
+    contractAddress: process.env.ASSET_CONTRACT_ADDRESS || '',
+  },
   logger: {
     loki: {
       isActive: true,
