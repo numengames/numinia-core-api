@@ -22,15 +22,37 @@ const contractABI = [
     "stateMutability": "payable",
   },
   {
-    "inputs": [],
-    "name": "implementation",
-    "outputs": [{
-      "name": "",
-      "type": "address",
-      "internalType": "address",
-    }],
+    'inputs': [
+      {
+        'internalType': 'address',
+        'name': 'from',
+        'type': 'address'
+      },
+      {
+        'internalType': 'address',
+        'name': 'to',
+        'type': 'address'
+      },
+      {
+        'internalType': 'uint256',
+        'name': 'id',
+        'type': 'uint256'
+      },
+      {
+        'internalType': 'uint256',
+        'name': 'amount',
+        'type': 'uint256'
+      },
+      {
+        'internalType': 'bytes',
+        'name': 'data',
+        'type': 'bytes'
+      }
+    ],
+    "name": "safeTransferFrom",
+    "outputs": [],
     "type": "function",
-    "stateMutability": "view",
+    "stateMutability": "nonpayable",
   },
   {
     "type": "receive",
@@ -40,27 +62,29 @@ const contractABI = [
 
 export default class AssetService implements AssetServiceAttributes {
   private readonly assetConfig: any;
-  private readonly contract: any;
   private readonly provider: any;
   private readonly logger: loggerInterfaces.ILogger;
 
   constructor({ loggerHandler, config }: AssetServiceConstructor) {
     this.logger = loggerHandler('AssetService');
     this.assetConfig = config.assets;
+    this.provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
   }
 
   async transferToken({ walletId, deliverOption }: Record<string, unknown>): Promise<void> {
+    if (!walletId) {
+      throw new Error('walletId is required');
+    }
+
     const amount = 1;
     const tokenId = 3;
     const fromAddress = this.assetConfig.address;
     const privateKey = this.assetConfig.privateKey;
 
-    const provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
-    const contract = new ethers.Contract(this.assetConfig.contractAddress, contractABI, provider);
+    const contract = new ethers.Contract(this.assetConfig.contractAddress, contractABI, this.provider);
 
     try {
-      const wallet = new ethers.Wallet(privateKey, provider);
-
+      const wallet = new ethers.Wallet(privateKey, this.provider);
       const contractWithSigner = contract.connect(wallet);
 
       const tx = await contractWithSigner.safeTransferFrom(fromAddress, walletId as string, tokenId, amount, '0x');
