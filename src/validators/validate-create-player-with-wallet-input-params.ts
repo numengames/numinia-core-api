@@ -4,6 +4,7 @@ import Joi from 'joi';
 import { paramNotValidError } from '../errors';
 
 export const schema = Joi.object({
+  tokenId: Joi.number().required(),
   walletId: Joi.string().trim().required(),
   userName: Joi.string().trim().required(),
 }).required();

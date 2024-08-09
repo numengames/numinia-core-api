@@ -71,13 +71,12 @@ export default class AssetService implements AssetServiceAttributes {
     this.provider = new ethers.JsonRpcProvider('https://mainnet.base.org');
   }
 
-  async transferToken({ walletId, deliverOption }: Record<string, unknown>): Promise<void> {
+  async transferToken({ walletId, tokenId, deliverOption }: Record<string, unknown>): Promise<void> {
     if (!walletId) {
       throw new Error('walletId is required');
     }
 
     const amount = 1;
-    const tokenId = 3;
     const fromAddress = this.assetConfig.address;
     const privateKey = this.assetConfig.privateKey;
 
