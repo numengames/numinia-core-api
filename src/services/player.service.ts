@@ -1,9 +1,15 @@
-import { interfaces as modelInterfaces } from '@numengames/numinia-models';
 import { interfaces as loggerInterfaces } from '@numengames/numinia-logger';
+import { interfaces as modelInterfaces, types as modelTypes } from '@numengames/numinia-models';
 import { Model } from 'mongoose';
 
 export interface PlayerServiceAttributes {
-  createPlayerWithWalletIfNotExist({ walletId, userName }: Record<string, string>): Promise<void>;
+  getPlayerData(params: { platform: string; id: string }): Promise<modelTypes.PlayerDocument | null>;
+  findPlayerByPlatformId(params: { platform: string; id: string }): Promise<modelTypes.PlayerDocument | null>;
+  createPlayerFromExternalPlatform(params: {
+    platform: string;
+    id: string;
+    playerName: string;
+  }): Promise<modelTypes.PlayerDocument>;
 }
 
 interface PlayerServiceConstructor {
@@ -11,26 +17,71 @@ interface PlayerServiceConstructor {
   loggerHandler: (title: string) => loggerInterfaces.ILogger;
 }
 
+type DynamicKeys = 'oncyberId' | 'hyperfyId';
+
 export default class PlayerService implements PlayerServiceAttributes {
   private readonly logger: loggerInterfaces.ILogger;
-
   private PlayerModel: Model<modelInterfaces.PlayerAttributes>;
+
+  static queryMap: Record<string, DynamicKeys> = {
+    oncyber: 'oncyberId',
+    hyperfy: 'hyperfyId',
+  };
 
   constructor({ PlayerModel, loggerHandler }: PlayerServiceConstructor) {
     this.PlayerModel = PlayerModel;
     this.logger = loggerHandler('PlayerService');
   }
 
-  private async doesPlayerByWalletIdExist(walletId: string): Promise<boolean> {
-    const playerDocument = await this.PlayerModel.exists({ walletId });
-    return playerDocument !== null;
+  async findPlayerByPlatformId({
+    platform,
+    id,
+  }: {
+    platform: string;
+    id: string;
+  }): Promise<modelTypes.PlayerDocument | null> {
+    return platform === 'substrata' ? this.getPlayerDataById(id) : this.findPlayerByField(platform, id);
   }
 
-  async createPlayerWithWalletIfNotExist({ walletId, userName }: Record<string, string>): Promise<void> {
-    const playerDocumentExists = await this.doesPlayerByWalletIdExist(walletId);
+  async createPlayerFromExternalPlatform({
+    platform,
+    id,
+    playerName,
+  }: {
+    platform: string;
+    id: string;
+    playerName: string;
+  }): Promise<modelTypes.PlayerDocument> {
+    const newPlayerData: Partial<modelInterfaces.PlayerAttributes> = {
+      playerName,
+      isActive: true,
+      isBlocked: false,
+      lastConnectionDate: new Date(),
+      [PlayerService.queryMap[platform]]: id,
+    };
 
-    if (!playerDocumentExists) {
-      await this.PlayerModel.create({ walletId, userName });
+    return this.PlayerModel.create(newPlayerData);
+  }
+
+  private async getPlayerDataById(id: string): Promise<modelTypes.PlayerDocument | null> {
+    return this.PlayerModel.findById(id);
+  }
+
+  private async findPlayerByField(platform: string, id: string): Promise<modelTypes.PlayerDocument | null> {
+    const field = PlayerService.queryMap[platform as DynamicKeys];
+    if (!field) {
+      throw new Error('Invalid platform type');
     }
+    return this.PlayerModel.findOne({ [field]: id });
+  }
+
+  async getPlayerData({
+    platform,
+    id,
+  }: {
+    platform: string;
+    id: string;
+  }): Promise<modelTypes.PlayerDocument | null> {
+    return platform === 'substrata' ? this.getPlayerDataById(id) : this.findPlayerByField(platform, id);
   }
 }

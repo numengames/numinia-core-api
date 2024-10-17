@@ -1,7 +1,7 @@
 import { interfaces as loggerInterfaces } from '@numengames/numinia-logger';
 import { Router } from 'express';
 
-import { playerService } from '../../../services';
+import { playerService, playerSessionService } from '../../../services';
 import PlayerController, { PlayerControllerAttributes } from '../controllers/player.controller';
 
 export default class PlayerRoutes {
@@ -15,12 +15,14 @@ export default class PlayerRoutes {
     this.playerController = new PlayerController({
       playerService,
       loggerHandler,
+      playerSessionService,
     });
 
     this.routes();
   }
 
   routes(): void {
-    this.router.post('/create', this.playerController.createPlayerWithWallet.bind(this.playerController));
+    this.router.get('/:platform/:id', this.playerController.getPlayerInfo.bind(this.playerController));
+    this.router.post('/external', this.playerController.createPlayerFromExternalPlatform.bind(this.playerController));
   }
 }

@@ -6,4 +6,7 @@ const notFound = (message?: string) => Boom.notFound(message);
 
 export const paramNotValidError = badData;
 export const gameNotExistError = notFound;
+export const invalidPlayerDataError = badData;
+export const sessionDoesNotExistError = notFound;
+export const playerAlreadyExistsError = conflict;
 export const conversationNotExistError = notFound;

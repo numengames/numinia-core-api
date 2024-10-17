@@ -4,7 +4,9 @@ import {
   ConversationModel,
   GameModel,
   PlayerModel,
+  PlayerSessionModel,
   constants,
+  types as modelTypes,
   interfaces as modelInterfaces,
   mongoose,
 } from '@numengames/numinia-models';
@@ -69,32 +71,35 @@ export async function insertGame(
 }
 
 interface InsertPlayerParams extends Partial<modelInterfaces.PlayerAttributes> {
-  account?: modelInterfaces.PlayerAccountAttributes;
 }
 
-export async function insertPlayer(params: InsertPlayerParams = {}): Promise<modelInterfaces.PlayerAttributes> {
+export async function insertPlayer(params: Partial<modelInterfaces.PlayerAttributes> = {}): Promise<modelTypes.PlayerDocument> {
   const query: Partial<modelInterfaces.PlayerAttributes> = {
-    accounts: [],
-    lastConectionDate: params.lastConectionDate || new Date(),
-    userName: params.userName || faker.internet.userName(),
-    walletId: params.walletId || faker.finance.ethereumAddress(),
-    isActive: params.isActive || faker.helpers.arrayElement([true, false]),
-    isBlocked: params.isBlocked || faker.helpers.arrayElement([true, false]),
+    lastConnectionDate: new Date(),
+    oncyberId: faker.string.uuid(),
+    hyperfyId: faker.string.uuid(),
+    playerName: faker.internet.userName(),
+    isActive: faker.helpers.arrayElement([true, false]),
+    isBlocked: faker.helpers.arrayElement([true, false]),
   };
 
-  if (!params.account) {
-    query.accounts?.push({
-      kind: constants.AccountKindTypes.INTERNAL,
-      accountId: new mongoose.Types.ObjectId(),
-    } as any);
-  } else {
-    query.accounts?.push(params.account);
-  }
+  return PlayerModel.create({
+    ...query,
+    ...params,
+  });
+}
 
-  const finalData = Object.fromEntries(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    Object.entries({ ...query, ...params }).filter(([_, v]) => v !== undefined),
-  );
+export async function insertPlayerSession(params: Partial<modelInterfaces.PlayerSessionAttributes> = {}): Promise<modelTypes.PlayerSessionDocument> {
+  const query: Partial<modelInterfaces.PlayerSessionAttributes> = {
+    startAt: new Date(),
+    userAgent: faker.internet.userAgent(),
+    spaceName: faker.lorem.words(3).replace(' ', '_'),
+    platform: faker.helpers.arrayElement(['Mobile', 'PC']),
+    isAnonymous: faker.helpers.arrayElement([true, false]),
+  };
 
-  return PlayerModel.create(finalData);
+  return PlayerSessionModel.create({
+    ...query,
+    ...params,
+  });
 }
