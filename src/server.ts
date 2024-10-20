@@ -31,7 +31,9 @@ class Server {
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(compression());
-    this.app.use(cors());
+    this.app.use(cors({
+      origin: [/^https:\/\/.*\.oncyber\.xyz$/, /^https:\/\/.*\.oncyber\.io$/]
+    }));
     // TODO: Try PINO package & pino-loki-transport instead of winston & winston-loki
     initExpressLogger(config.logger, this.app);
   }
