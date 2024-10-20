@@ -25,7 +25,8 @@ export default class RewardService implements RewardServiceAttributes {
     this.logger = loggerHandler('RewardService');
   }
 
-  async getRewardsByPlayerId({ playerId }: { playerId: string }): Promise<modelInterfaces.PlayerRewardAttributes[]> {
+  // TODO: modelInterfaces.PlayerRewardAttributes[]
+  async getRewardsByPlayerId({ playerId }: { playerId: string }): Promise<any> {
     return this.PlayerRewardModel.find({ playerId })
       .select('-_id -createdAt -updatedAt')
       .populate({
